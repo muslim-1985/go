@@ -1,9 +1,9 @@
 package main
-
 import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"bot/http/controllers"
 )
 
 func main() {
@@ -11,7 +11,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-	a := App{}
+	a := controllers.App{}
 	a.Initialize(
 		os.Getenv("APP_DB_USERNAME"),
 		os.Getenv("APP_DB_PASSWORD"),
