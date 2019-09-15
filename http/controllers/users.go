@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
+	"parser/models"
 	"strconv"
-	"bot/models"
 )
 
 func (a *App) GetProducts(w http.ResponseWriter, r *http.Request) {

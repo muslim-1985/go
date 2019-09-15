@@ -1,18 +1,10 @@
 package controllers
 
 import (
-	"database/sql"
 	"encoding/json"
-	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"net/http"
 )
-
-type App struct {
-	Router *mux.Router
-	DB     *sql.DB
-	Serv   *http.Server
-}
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
 	respondWithJSON(w, code, map[string]string{"error": message})

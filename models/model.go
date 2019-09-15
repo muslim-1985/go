@@ -5,10 +5,11 @@ import (
 )
 
 type Product struct {
-	ID int `json:"id"`
-	Name string `json:"name"`
+	ID    int     `json:"id"`
+	Name  string  `json:"name"`
 	Price float64 `json:"price"`
 }
+
 func (p *Product) GetProduct(db *sql.DB) error {
 	return db.QueryRow("SELECT name, price FROM products WHERE id=$1",
 		p.ID).Scan(&p.Name, &p.Price)
@@ -39,7 +40,7 @@ func (p *Product) CreateProduct(db *sql.DB) error {
 
 func GetProducts(db *sql.DB, start, count int) ([]Product, error) {
 	rows, err := db.Query(
-		"SELECT id, username FROM bot_users LIMIT $1 OFFSET $2",
+		"SELECT id, username FROM users LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -60,4 +61,3 @@ func GetProducts(db *sql.DB, start, count int) ([]Product, error) {
 
 	return products, nil
 }
-
