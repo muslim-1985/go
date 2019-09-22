@@ -18,11 +18,11 @@ func (a *Route) CreateRoute() {
 	a.initializeRoutes()
 }
 func (a *Route) initializeRoutes() {
-	a.Router.HandleFunc("/products", a.Action.GetProducts).Methods("GET")
-	a.Router.HandleFunc("/product", a.Action.CreateProduct).Methods("POST")
-	a.Router.HandleFunc("/product/{id:[0-9]+}", a.Action.GetProduct).Methods("GET")
-	a.Router.HandleFunc("/product/{id:[0-9]+}", a.Action.UpdateProduct).Methods("PUT")
-	a.Router.HandleFunc("/product/{id:[0-9]+}", a.Action.DeleteProduct).Methods("DELETE")
+	a.Router.HandleFunc("/users", a.Action.GetUsers).Methods("GET")
+	a.Router.HandleFunc("/user/register", a.Action.UserRegister).Methods("POST")
+	a.Router.HandleFunc("/user/{id:[0-9]+}", a.Action.GetUser).Methods("GET")
+	a.Router.HandleFunc("/user/update/{id:[0-9]+}", a.Action.UpdateUser).Methods("PUT")
+	a.Router.HandleFunc("/user/delete/{id:[0-9]+}", a.Action.DeleteUser).Methods("DELETE")
 }
 
 func (a *Route) Run(addr string) {

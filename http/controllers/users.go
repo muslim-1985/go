@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-func (a *App) GetProducts(w http.ResponseWriter, r *http.Request) {
+func (a *App) GetUsers(w http.ResponseWriter, r *http.Request) {
 	count, _ := strconv.Atoi(r.FormValue("count"))
 	start, _ := strconv.Atoi(r.FormValue("start"))
 
@@ -20,7 +20,7 @@ func (a *App) GetProducts(w http.ResponseWriter, r *http.Request) {
 		start = 0
 	}
 
-	products, err := models.GetProducts(a.DB, start, count)
+	products, err := models.GetUsers(a.DB, start, count)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -29,8 +29,8 @@ func (a *App) GetProducts(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, products)
 }
 
-func (a *App) CreateProduct(w http.ResponseWriter, r *http.Request) {
-	var p models.Product
+func (a *App) UserRegister(w http.ResponseWriter, r *http.Request) {
+	var p models.User
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&p); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
@@ -38,7 +38,7 @@ func (a *App) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if err := p.CreateProduct(a.DB); err != nil {
+	if err := p.UserRegister(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -46,7 +46,7 @@ func (a *App) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusCreated, p)
 }
 
-func (a *App) GetProduct(w http.ResponseWriter, r *http.Request) {
+func (a *App) GetUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -54,8 +54,8 @@ func (a *App) GetProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := models.Product{ID: id}
-	if err := p.GetProduct(a.DB); err != nil {
+	p := models.User{ID: id}
+	if err := p.GetUser(a.DB); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			respondWithError(w, http.StatusNotFound, "Product not found")
@@ -68,7 +68,7 @@ func (a *App) GetProduct(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, p)
 }
 
-func (a *App) UpdateProduct(w http.ResponseWriter, r *http.Request) {
+func (a *App) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -76,7 +76,7 @@ func (a *App) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var p models.Product
+	var p models.User
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&p); err != nil {
 		respondWithError(w, http.StatusBadRequest, "Invalid resquest payload")
@@ -85,7 +85,7 @@ func (a *App) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	p.ID = id
 
-	if err := p.UpdateProduct(a.DB); err != nil {
+	if err := p.UpdateUser(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -93,7 +93,7 @@ func (a *App) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, p)
 }
 
-func (a *App) DeleteProduct(w http.ResponseWriter, r *http.Request) {
+func (a *App) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
@@ -101,8 +101,8 @@ func (a *App) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := models.Product{ID: id}
-	if err := p.DeleteProduct(a.DB); err != nil {
+	p := models.User{ID: id}
+	if err := p.DeleteUser(a.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
