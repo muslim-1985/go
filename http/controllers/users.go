@@ -3,12 +3,10 @@ package controllers
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"net/http"
 	"parser/models"
 	"strconv"
-	"time"
 )
 
 func (a *App) GetUsers(w http.ResponseWriter, r *http.Request) {
@@ -44,17 +42,7 @@ func (a *App) UserRegister(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	var mySigningKey = []byte("secret")
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := make(jwt.MapClaims)
-	claims["admin"] = true
-	claims["name"] = p.Username
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-	token.Claims = claims
-	tokenString, _ := token.SignedString(mySigningKey)
-	p.Token = tokenString
-
+	createToken(&p)
 	respondWithJSON(w, http.StatusCreated, p)
 }
 
@@ -71,17 +59,7 @@ func (a *App) LoginUser(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	var mySigningKey = []byte("secret")
-	token := jwt.New(jwt.SigningMethodHS256)
-	claims := make(jwt.MapClaims)
-	claims["admin"] = true
-	claims["name"] = p.Username
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-	token.Claims = claims
-	tokenString, _ := token.SignedString(mySigningKey)
-	p.Token = tokenString
-
+	createToken(p)
 	respondWithJSON(w, http.StatusCreated, p)
 }
 

@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"github.com/auth0/go-jwt-middleware"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -16,25 +14,18 @@ type Route struct {
 	Action controllers.App
 }
 
-var mySigningKey = []byte("secret")
-var jwtMiddleware = jwtmiddleware.New(jwtmiddleware.Options{
-	ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-		return mySigningKey, nil
-	},
-	SigningMethod: jwt.SigningMethodHS256,
-})
-
 func (a *Route) CreateRoute() {
 	a.initializeRoutes()
 }
 func (a *Route) initializeRoutes() {
-	a.Router.HandleFunc("/users", a.Action.GetUsers).Methods("GET")
-	a.Router.HandleFunc("/user/register",  a.Action.UserRegister).Methods("POST")
+	a.Router.Use(controllers.JwtAuthentication)
+	a.Router.HandleFunc("/api/users", a.Action.GetUsers).Methods("GET")
+	a.Router.HandleFunc("/api/user/register",  a.Action.UserRegister).Methods("POST")
 	//jwtMiddleware.Handler(c)
-	a.Router.HandleFunc("/user/login", a.Action.LoginUser).Methods("POST")
-	a.Router.HandleFunc("/user/{id:[0-9]+}", a.Action.GetUser).Methods("GET")
-	a.Router.HandleFunc("/user/update/{id:[0-9]+}", a.Action.UpdateUser).Methods("PUT")
-	a.Router.HandleFunc("/user/delete/{id:[0-9]+}", a.Action.DeleteUser).Methods("DELETE")
+	a.Router.HandleFunc("/api/user/login", a.Action.LoginUser).Methods("POST")
+	a.Router.HandleFunc("/api/user/{id:[0-9]+}", a.Action.GetUser).Methods("GET")
+	a.Router.HandleFunc("/api/user/update/{id:[0-9]+}", a.Action.UpdateUser).Methods("PUT")
+	a.Router.HandleFunc("/api/user/delete/{id:[0-9]+}", a.Action.DeleteUser).Methods("DELETE")
 }
 
 func (a *Route) Run(addr string) {
