@@ -3,7 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
-	//"errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -11,6 +11,7 @@ type User struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	Token string `json:"token"`
 }
 
 //var tableName = "users"
@@ -32,6 +33,31 @@ func (p *User) DeleteUser(db *sql.DB) error {
 	return err
 }
 
+func (p *User) LoginUser(db *sql.DB) error {
+	var checkUserExist *bool
+	var password *string
+	err := db.QueryRow("select exists(select email from users where email=$1)",
+		p.Email).Scan(&checkUserExist)
+	if *checkUserExist {
+		err := db.QueryRow("select password from users where email=$1", p.Email).Scan(&password)
+		if err != nil {
+			return err
+		}
+		byteHash := []byte(*password)
+		bytePass := []byte(p.Password)
+		result := bcrypt.CompareHashAndPassword(byteHash, bytePass)
+		if result != nil {
+			return errors.New("Login or password is not correct")
+		}
+		return db.QueryRow("SELECT username, email FROM users WHERE email=$1",
+			p.Email).Scan(&p.Username, &p.Email)
+	}
+	if err != nil {
+		return err
+	}
+	return errors.New("Login or password is not correct")
+}
+
 func (p *User) UserRegister(db *sql.DB) error {
 	var checkUserExist *bool
 	err := db.QueryRow("select exists(select email from users where email=$1)",
@@ -42,6 +68,13 @@ func (p *User) UserRegister(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
+	bytePassword := []byte(p.Password)
+	hash, err := bcrypt.GenerateFromPassword(bytePassword, bcrypt.MinCost)
+	if err != nil {
+		return err
+	}
+	password := string(hash)
+	p.Password = password
 	error1 := db.QueryRow(
 		"INSERT INTO users(username, email, password) VALUES($1, $2, $3) RETURNING id", p.Username,
 		p.Email, p.Password).Scan(&p.ID)
