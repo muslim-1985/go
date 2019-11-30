@@ -11,3 +11,9 @@ type App struct {
 	Router *mux.Router
 	Serv   *http.Server
 }
+
+type Workers struct {
+	Workers int
+}
+
+var InitWorkers = Workers{Workers: 1}

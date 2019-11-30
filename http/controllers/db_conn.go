@@ -10,6 +10,8 @@ type App struct {
 	DB *sql.DB
 }
 
+var InitDB App = App{}
+
 func (a *App) Initialize(user, password, dbname string) {
 	connectionString :=
 		fmt.Sprintf("user=%s password=%s dbname=%s", user, password, dbname)
