@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"net/http"
-	"parser/models"
+	"parser/users/models"
 	"strconv"
 )
 

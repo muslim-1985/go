@@ -2,18 +2,26 @@ package config
 
 import (
 	"database/sql"
-	"github.com/gorilla/mux"
-	"net/http"
+	"fmt"
+	"log"
 )
 
 type App struct {
 	DB     *sql.DB
-	Router *mux.Router
-	Serv   *http.Server
 }
 
-type Workers struct {
-	Workers int
+//type Workers struct {
+//	Workers int
+//}
+func (a *App) Initialize(user, password, dbname string) {
+	connectionString :=
+		fmt.Sprintf("user=%s password=%s dbname=%s", user, password, dbname)
+
+	var err error
+	a.DB, err = sql.Open("postgres", connectionString)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-var InitWorkers = Workers{Workers: 1}
+//var InitWorkers = Workers{Workers: 1}

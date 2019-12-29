@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	"net/http"
 	"os"
-	"parser/models"
+	"parser/users/models"
 	"strings"
 	"time"
 )
@@ -48,7 +48,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		notAuth := []string{"/api/user/login", "/api/users"} //List of endpoints that doesn't require auth
+		notAuth := []string{"/api/user/login", "/api/users", "/api/user/register"} //List of endpoints that doesn't require auth
 		requestPath := r.URL.Path //current request path
 
 		//check if request does not need authentication, serve the request if it doesn't need it
@@ -82,7 +82,7 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			return []byte(os.Getenv("SECRET_KEY")), nil
 		})
 
-		if err != nil { //Malformed token, returns with http code 403 as usual
+		if err != nil { //Malformed token, returns with users code 403 as usual
 			c := map[string]string{"message": "Malformed authentication token"}//Token is missing, returns with error code 403 Unauthorized
 			respondWithJSON(w, http.StatusForbidden, c)
 			return

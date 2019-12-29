@@ -6,19 +6,11 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type User struct {
-	ID       int    `json:"id"`
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Token string `json:"token"`
-}
-
 //var tableName = "users"
 
 func (p *User) GetUser(db *sql.DB) error {
-	return db.QueryRow("SELECT username, email FROM users WHERE id=$1",
-		p.ID).Scan(&p.Username, &p.Email)
+	return db.QueryRow("SELECT users.id username, email, is_active, roles.name FROM users join roles on users.role_id=roles.id WHERE users.id=$1",
+		p.ID).Scan(&p.ID, &p.Username, &p.Email, &p.IsActive, &p.Role)
 }
 
 func (p *User) UpdateUser(db *sql.DB) error {
@@ -76,8 +68,9 @@ func (p *User) UserRegister(db *sql.DB) error {
 	password := string(hash)
 	p.Password = password
 	error1 := db.QueryRow(
-		"INSERT INTO users(username, email, password) VALUES($1, $2, $3) RETURNING id", p.Username,
-		p.Email, p.Password).Scan(&p.ID)
+		"INSERT INTO users(username, email, password, role_id) VALUES($1, $2, $3, $4) RETURNING id, (select name from roles where roles.id = $4)", p.Username,
+		p.Email, p.Password, p.RoleId).Scan(&p.ID, &p.Role)
+	p.Password = ""
 	if error1 != nil {
 		return error1
 	}
@@ -86,7 +79,7 @@ func (p *User) UserRegister(db *sql.DB) error {
 
 func GetUsers(db *sql.DB, start, count int) ([]User, error) {
 	rows, err := db.Query(
-		"SELECT id, username FROM users LIMIT $1 OFFSET $2",
+		"SELECT users.id, username, email, is_active, roles.name FROM users JOIN roles on users.role_id = roles.id LIMIT $1 OFFSET $2",
 		count, start)
 
 	if err != nil {
@@ -99,7 +92,7 @@ func GetUsers(db *sql.DB, start, count int) ([]User, error) {
 
 	for rows.Next() {
 		var p User
-		if err := rows.Scan(&p.ID, &p.Username); err != nil {
+		if err := rows.Scan(&p.ID, &p.Username, &p.Email, &p.IsActive, &p.Role); err != nil {
 			return nil, err
 		}
 		users = append(users, p)
